@@ -1,0 +1,44 @@
+{
+  "language": "en",
+  "provider": "google",
+  "max_tokens": 8192,
+  "anthropic": {
+    "api_key": "",
+    "model": "claude-haiku-4-5-20251001",
+    "timeout_sec": 30
+  },
+  "openai": {
+    "api_key": "",
+    "model": "gpt-4o-mini",
+    "timeout_sec": 30
+  },
+  "google": {
+    "api_key": "",
+    "model": "gemini-2.5-flash",
+    "timeout_sec": 30
+  },
+  "ollama": {
+    "api_key": "",
+    "model": "qwen3:8b",
+    "timeout_sec": 30
+  },
+  "voyage": {
+    "api_key": "",
+    "embed_model": "voyage-4",
+    "rerank_model": "rerank-2.5"
+  },
+  "uesp_lookup": {
+    "enabled": true,
+    "worker_url": "",
+    "timeout_sec": 10
+  },
+  "window": {
+    "output_x": 100,
+    "output_y": 100,
+    "output_w": 400,
+    "output_h": 700,
+    "bar_x": 100,
+    "bar_y": 50,
+    "opacity": 90
+  }
+}

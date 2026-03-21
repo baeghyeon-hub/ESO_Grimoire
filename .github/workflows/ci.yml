@@ -1,0 +1,57 @@
+# .github/workflows/ci.yml
+#
+# ESO 번역툴 CI
+# 트리거: main 브랜치 push
+#
+# 단계:
+#   1. Python 3.11 셋업
+#   2. 테스트 전용 의존성 설치 (PyQt6 제외 — headless 환경)
+#   3. pytest 실행 (149개 테스트)
+#   4. 결과 요약 출력
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: pytest (Python 3.11, Windows)
+    runs-on: windows-latest        # ESO는 Windows 전용 — 빌드 환경과 동일하게 맞춤
+
+    steps:
+      # ── 1. 코드 체크아웃 ──────────────────────────────────
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Python 셋업 ────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      # ── 3. 의존성 설치 ────────────────────────────────────
+      # PyQt6 / plyer / winotify 는 UI 레이어 전용.
+      # 테스트 대상(core/, watcher/)이 이들에 의존하지 않으므로 제외.
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pytest pytest-timeout pyyaml
+
+      # ── 4. pytest 실행 ───────────────────────────────────
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v --timeout=30 --tb=short
+        env:
+          PYTHONPATH: .            # core/, watcher/ import 경로
+
+      # ── 5. 결과 요약 (실패 시에도 출력) ─────────────────
+      - name: Test summary
+        if: always()
+        run: |
+          python -m pytest tests/ --tb=no -q 2>&1 | tail -3
+        env:
+          PYTHONPATH: .
