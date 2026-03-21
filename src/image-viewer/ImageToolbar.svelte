@@ -1,6 +1,7 @@
 <script>
   import { currentImage, zoomLevel, historyIndex, imageHistory, zoomIn, zoomOut, resetZoom, fitToWindow, previousImage, nextImage } from '../lib/imageStore.js';
   import { open } from '@tauri-apps/plugin-shell';
+  import { t } from '../lib/i18n.js';
 
   async function downloadImage() {
     if (!$currentImage.url) return;
@@ -30,33 +31,33 @@
 
 <div class="toolbar">
   <div class="toolbar-left">
-    <button class="tool-btn" on:click={previousImage} disabled={!canPrevious} title="Previous image">
-      ← Prev
+    <button class="tool-btn" on:click={previousImage} disabled={!canPrevious} title={t("prev_image")}>
+      {t("prev")}
     </button>
-    <button class="tool-btn" on:click={nextImage} disabled={!canNext} title="Next image">
-      Next →
+    <button class="tool-btn" on:click={nextImage} disabled={!canNext} title={t("next_image")}>
+      {t("next")}
     </button>
 
     <div class="separator"></div>
 
-    <button class="tool-btn" on:click={zoomOut} title="Zoom out">−</button>
+    <button class="tool-btn" on:click={zoomOut} title={t("zoom_out")}>−</button>
     <span class="zoom-display">{zoomPercent}%</span>
-    <button class="tool-btn" on:click={zoomIn} title="Zoom in">+</button>
-    <button class="tool-btn" on:click={resetZoom} title="Reset zoom">Reset</button>
+    <button class="tool-btn" on:click={zoomIn} title={t("zoom_in")}>+</button>
+    <button class="tool-btn" on:click={resetZoom} title={t("reset_zoom")}>{t("reset")}</button>
 
     <div class="separator"></div>
 
-    <button class="tool-btn" on:click={handleFit} title="Fit to window">Fit</button>
+    <button class="tool-btn" on:click={handleFit} title={t("fit_window")}>{t("fit")}</button>
   </div>
 
   <div class="toolbar-right">
     {#if uespLink}
-      <button class="tool-btn accent" on:click={() => open(uespLink)} title="Open on UESP Wiki">
+      <button class="tool-btn accent" on:click={() => open(uespLink)} title={t("open_uesp")}>
         UESP
       </button>
     {/if}
-    <button class="tool-btn accent" on:click={downloadImage} title="Download / Open original">
-      Download
+    <button class="tool-btn accent" on:click={downloadImage} title={t("download_original")}>
+      {t("download")}
     </button>
   </div>
 </div>

@@ -1,5 +1,6 @@
 <script>
   import { currentImage } from '../lib/imageStore.js';
+  import { t } from '../lib/i18n.js';
 
   // 이미지 정보 표시 여부
   let showInfo = true;
@@ -12,8 +13,8 @@
 
   // 이미지 출처
   function getSource() {
-    if ($currentImage.source === 'uesp') return 'UESP Wiki';
-    return 'External';
+    if ($currentImage.source === 'uesp') return t('uesp_wiki');
+    return t('external');
   }
 
   $: filename = getFilename();
@@ -25,9 +26,9 @@
     <button
       class="toggle-btn"
       on:click={() => (showInfo = !showInfo)}
-      title={showInfo ? 'Hide info' : 'Show info'}
+      title={showInfo ? t('hide_info') : t('show_info')}
     >
-      {showInfo ? '▼' : '▶'} Info
+      {showInfo ? '▼' : '▶'} {t('info')}
     </button>
   </div>
 
@@ -35,33 +36,33 @@
     <div class="info-content">
       {#if $currentImage.title}
         <div class="info-row">
-          <span class="info-label">Caption:</span>
+          <span class="info-label">{t('caption')}</span>
           <span class="info-value">{$currentImage.title}</span>
         </div>
       {/if}
 
       {#if $currentImage.width && $currentImage.height}
         <div class="info-row">
-          <span class="info-label">Dimensions:</span>
+          <span class="info-label">{t('dimensions')}</span>
           <span class="info-value">{$currentImage.width} × {$currentImage.height}px</span>
         </div>
       {/if}
 
       <div class="info-row">
-        <span class="info-label">Source:</span>
+        <span class="info-label">{t('source')}</span>
         <span class="info-value">{source}</span>
       </div>
 
       {#if filename}
         <div class="info-row">
-          <span class="info-label">File:</span>
+          <span class="info-label">{t('file')}</span>
           <span class="info-value info-mono">{filename}</span>
         </div>
       {/if}
 
       {#if $currentImage.url}
         <div class="info-row">
-          <span class="info-label">URL:</span>
+          <span class="info-label">{t('url')}</span>
           <span class="info-value info-mono info-url">{$currentImage.url}</span>
         </div>
       {/if}

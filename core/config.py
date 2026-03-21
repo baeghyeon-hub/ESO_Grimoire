@@ -19,6 +19,7 @@ BASE_DIR = _base_dir()
 CONFIG_FILE = os.path.join(BASE_DIR, "config.json")
 
 DEFAULT_CONFIG: dict = {
+    "language": "en",
     "provider": "anthropic",
     "max_tokens": 8192,
     "anthropic": {
@@ -69,7 +70,7 @@ def load_config() -> dict:
             with open(CONFIG_FILE, "r", encoding="utf-8") as f:
                 data = json.load(f)
             merged = copy.deepcopy(DEFAULT_CONFIG)
-            for key in ("provider", "max_tokens"):
+            for key in ("language", "provider", "max_tokens"):
                 if key in data:
                     merged[key] = data[key]
             for section in ("anthropic", "openai", "google", "ollama", "voyage", "uesp_lookup", "window"):

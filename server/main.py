@@ -44,6 +44,7 @@ class ChatRequest(BaseModel):
 
 
 class ConfigUpdate(BaseModel):
+    language: str = ""
     provider: str = ""
     model: str = ""
     api_key: str = ""
@@ -97,6 +98,9 @@ async def get_config():
 async def update_config(req: ConfigUpdate):
     """Save settings."""
     cfg = load_config()
+
+    if req.language:
+        cfg["language"] = req.language
 
     if req.provider:
         cfg["provider"] = req.provider

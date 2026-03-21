@@ -3,6 +3,7 @@
   import { getCurrentWebviewWindow } from '@tauri-apps/api/webviewWindow';
   import { getCurrentWindow } from '@tauri-apps/api/window';
   import { currentImage, error, setImage, setImageList, reset } from '../lib/imageStore.js';
+  import { t } from '../lib/i18n.js';
   import ImageDisplay from './ImageDisplay.svelte';
   import ImageToolbar from './ImageToolbar.svelte';
   import ImageInfo from './ImageInfo.svelte';
@@ -66,11 +67,11 @@
       {#if $currentImage.title}
         {$currentImage.title}
       {:else}
-        Image Viewer
+        {t("image_viewer")}
       {/if}
     </div>
     <div class="header-controls">
-      <button class="ctrl-btn close" on:click|stopPropagation={closeWindow} title="Close (ESC)">✕</button>
+      <button class="ctrl-btn close" on:click|stopPropagation={closeWindow} title={t("close_esc")}>✕</button>
     </div>
   </div>
 
@@ -84,7 +85,7 @@
       <ImageDisplay />
       <ImageInfo />
     {:else}
-      <div class="empty-message">No image loaded</div>
+      <div class="empty-message">{t("no_image")}</div>
     {/if}
   </div>
 

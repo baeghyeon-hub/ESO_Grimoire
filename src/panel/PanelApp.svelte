@@ -19,6 +19,7 @@
   let showSettings = $state(false);
   let showDbMissing = $state(false);
   let backendOnline = $state(false);
+  let langKey = $state(0);
   let opacity = $state(load("panelOpacity", 90));
   let opening = $state(true);
   const MINI_W = 120, MINI_H = 36;
@@ -62,10 +63,11 @@
         getConfig(),
         getProviders(),
       ]);
+      setLang(cfgRes.language || "en");
+      langKey++; // force re-render all children with new language
       config = cfgRes;
       providers = provRes;
       backendOnline = true;
-      setLang(cfgRes.language || "en");
 
       // Check if DB exists
       try {
@@ -203,6 +205,7 @@
       <div class="scroll-seam"></div>
     {/if}
     <div class="scroll-overlay" class:opening></div>
+    {#key langKey}
     <PanelHeader
       {opacity}
       onopacity={(v) => (opacity = v)}
@@ -236,6 +239,7 @@
     {#if showDbMissing}
       <DbMissingDialog onready={() => (showDbMissing = false)} />
     {/if}
+    {/key}
   </div>
 
 <style>

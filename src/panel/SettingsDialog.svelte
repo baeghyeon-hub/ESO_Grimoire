@@ -1,6 +1,6 @@
 <script>
   import { putConfig } from "../lib/api.js";
-  import { t } from "../lib/i18n.js";
+  import { t, setLang, getLang } from "../lib/i18n.js";
 
   let { config = null, providers = null, backendOnline = false, onclose, onrefresh } = $props();
 
@@ -47,6 +47,7 @@
     { value: 32768, key: "very_detailed" },
   ];
 
+  let selLang = $state(getLang());
   let selProvider = $state(config?.provider || "google");
   let selModel = $state("");
   let apiKey = $state("");
@@ -94,6 +95,7 @@
     }
     try {
       await putConfig({
+        language: selLang,
         provider: selProvider,
         model: selModel,
         api_key: apiKey || "",
@@ -101,6 +103,7 @@
         worker_url: workerUrl,
         timeout_sec: timeout,
       });
+      setLang(selLang);
       onrefresh();
       onclose();
     } catch (err) {
@@ -122,6 +125,14 @@
     {#if !backendOnline}
       <div class="offline-badge">{t("backend_offline")}</div>
     {/if}
+
+    <label>
+      <span>{t("language")}</span>
+      <select bind:value={selLang}>
+        <option value="en">{t("lang_en")}</option>
+        <option value="ko">{t("lang_ko")}</option>
+      </select>
+    </label>
 
     <label>
       <span>{t("provider")}</span>

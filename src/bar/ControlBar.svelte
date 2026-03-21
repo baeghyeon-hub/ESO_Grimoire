@@ -1,6 +1,7 @@
 <script>
   import { getCurrentWindow } from "@tauri-apps/api/window";
   import { send } from "../lib/channel.js";
+  import { t } from "../lib/i18n.js";
 
   let { onmini } = $props();
   let panelVisible = $state(true);
@@ -19,11 +20,11 @@
 <div class="bar" data-tauri-drag-region>
   <span class="title" data-tauri-drag-region>Grimoire</span>
   <div class="actions">
-    <button onclick={togglePanel} title={panelVisible ? "패널 숨기기" : "패널 보기"}>
+    <button onclick={togglePanel} title={panelVisible ? t("hide_panel") : t("show_panel")}>
       {panelVisible ? "▼" : "▲"}
     </button>
-    <button onclick={onmini} title="미니 바">─</button>
-    <button class="close" onclick={closeApp} title="종료">✕</button>
+    <button onclick={onmini} title={t("mini_bar")}>─</button>
+    <button class="close" onclick={closeApp} title={t("exit")}>✕</button>
   </div>
 </div>
 

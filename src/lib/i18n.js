@@ -1,9 +1,14 @@
 /**
  * Minimal i18n — English + Korean.
- * Usage: import { t } from "../lib/i18n.js";  t("key")
+ * Usage: import { t } from "../lib/i18n.svelte.js";  t("key")
  */
 
 const strings = {
+  // ── General ──
+  "language":         { en: "Language",         ko: "언어" },
+  "lang_en":          { en: "English",          ko: "English" },
+  "lang_ko":          { en: "한국어",            ko: "한국어" },
+
   // ── Panel Header ──
   "opacity":          { en: "Opacity",          ko: "투명도" },
   "settings":         { en: "Settings",         ko: "설정" },
@@ -111,9 +116,16 @@ const strings = {
 
 let _lang = "en";
 
-/** Set current language */
+// Load language from localStorage immediately (before first render)
+try {
+  const stored = localStorage.getItem("grimoire_lang");
+  if (stored === "ko" || stored === "en") _lang = stored;
+} catch {}
+
+/** Set current language and persist to localStorage */
 export function setLang(lang) {
   _lang = (lang === "ko") ? "ko" : "en";
+  try { localStorage.setItem("grimoire_lang", _lang); } catch {}
 }
 
 /** Get current language */
