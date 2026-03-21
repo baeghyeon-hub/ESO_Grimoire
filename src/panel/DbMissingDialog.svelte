@@ -1,5 +1,6 @@
 <script>
   import { getDbStatus } from "../lib/api.js";
+  import { t } from "../lib/i18n.js";
 
   let { onready } = $props();
   let checking = $state(false);
@@ -13,10 +14,10 @@
       if (status.ready) {
         onready?.();
       } else {
-        alert("Database not found. Please extract the DB files and try again.");
+        alert(t("db_not_found"));
       }
     } catch {
-      alert("Backend not responding.");
+      alert(t("backend_no_response"));
     }
     checking = false;
   }
@@ -28,31 +29,29 @@
 
 <div class="overlay">
   <div class="dialog">
-    <h3>Database Required</h3>
+    <h3>{t("db_required")}</h3>
 
-    <p class="desc">
-      Grimoire needs the ESO database to work. Download <strong>grimoire-db.zip</strong> from the releases page and extract it into the app's <code>db/</code> folder.
-    </p>
+    <p class="desc">{t("db_desc")}</p>
 
     <div class="steps">
       <div class="step">
         <span class="num">1</span>
-        <span>Download <strong>grimoire-db.zip</strong> from GitHub Releases</span>
+        <span>{t("db_step1")}</span>
       </div>
       <div class="step">
         <span class="num">2</span>
-        <span>Press <code>Win+R</code>, type <code>%LOCALAPPDATA%\Grimoire</code> → create a <code>db</code> folder → extract the zip there</span>
+        <span>{t("db_step2")}</span>
       </div>
       <div class="step">
         <span class="num">3</span>
-        <span>Click <strong>Re-check</strong> below</span>
+        <span>{t("db_step3")}</span>
       </div>
     </div>
 
     <div class="buttons">
-      <button class="download" onclick={openDownload}>Download DB</button>
+      <button class="download" onclick={openDownload}>{t("download_db")}</button>
       <button class="recheck" onclick={recheck} disabled={checking}>
-        {checking ? "Checking..." : "Re-check"}
+        {checking ? t("checking") : t("recheck")}
       </button>
     </div>
   </div>

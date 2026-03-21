@@ -1,5 +1,6 @@
 <script>
   import { putConfig } from "../lib/api.js";
+  import { t } from "../lib/i18n.js";
 
   let { config = null, providers = null, backendOnline = false, onclose, onrefresh } = $props();
 
@@ -40,10 +41,10 @@
 
   // Form state
   const TOKEN_OPTIONS = [
-    { value: 4096, label: "Short" },
-    { value: 8192, label: "Standard" },
-    { value: 16384, label: "Detailed" },
-    { value: 32768, label: "Very Detailed" },
+    { value: 4096, key: "short" },
+    { value: 8192, key: "standard" },
+    { value: 16384, key: "detailed" },
+    { value: 32768, key: "very_detailed" },
   ];
 
   let selProvider = $state(config?.provider || "google");
@@ -116,14 +117,14 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <div class="overlay" onclick={handleBackdrop}>
   <div class="dialog">
-    <h3>Settings</h3>
+    <h3>{t("settings_title")}</h3>
 
     {#if !backendOnline}
-      <div class="offline-badge">Backend offline — showing defaults</div>
+      <div class="offline-badge">{t("backend_offline")}</div>
     {/if}
 
     <label>
-      <span>Provider</span>
+      <span>{t("provider")}</span>
       <select bind:value={selProvider}>
         {#each Object.entries(labels) as [key, lbl]}
           <option value={key}>{lbl}</option>
@@ -132,7 +133,7 @@
     </label>
 
     <label>
-      <span>Model</span>
+      <span>{t("model")}</span>
       <select bind:value={selModel}>
         {#each currentModels as m}
           <option value={m.id}>{m.name}</option>
@@ -141,16 +142,16 @@
     </label>
 
     <label>
-      <span>Response Length</span>
+      <span>{t("response_length")}</span>
       <select bind:value={maxTokens}>
         {#each TOKEN_OPTIONS as opt}
-          <option value={opt.value}>{opt.label} ({(opt.value / 1024).toFixed(0)}K)</option>
+          <option value={opt.value}>{t(opt.key)} ({(opt.value / 1024).toFixed(0)}K)</option>
         {/each}
       </select>
     </label>
 
     <label>
-      <span>API Key</span>
+      <span>{t("api_key")}</span>
       <input
         type="password"
         bind:value={apiKey}
@@ -162,14 +163,13 @@
 
     {#if selProvider === "ollama"}
       <div class="warning">
-        ⚠ Local models have limited tool-calling ability, which may result in less accurate answers.
-        Recommended for personal experimentation or fine-tuned models only.
+        ⚠ {t("ollama_warning")}
       </div>
     {/if}
 
     <div class="buttons">
-      <button class="cancel" onclick={onclose}>Cancel</button>
-      <button class="save" onclick={handleSave}>Save</button>
+      <button class="cancel" onclick={onclose}>{t("cancel")}</button>
+      <button class="save" onclick={handleSave}>{t("save")}</button>
     </div>
   </div>
 </div>

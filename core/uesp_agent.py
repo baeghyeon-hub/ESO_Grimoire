@@ -168,8 +168,16 @@ def chat(user_message: str, cfg: dict) -> str:
     # Place length hint at top of system prompt (highest priority)
     length_hint = _LENGTH_HINTS.get(max_tokens, _LENGTH_HINTS[8192])
     length_prefix = f"[MANDATORY OUTPUT LENGTH]\n{length_hint}\nYou MUST follow the above length requirement. This overrides all other instructions.\n\n"
-    strict_prompt = length_prefix + STRICT_PROMPT
-    creative_prompt = length_prefix + SYSTEM_PROMPT
+
+    # Language instruction
+    lang = cfg.get("language", "en")
+    if lang == "ko":
+        lang_instruction = "[LANGUAGE] 반드시 한국어로 답변하세요. 게임 내 고유명사(스킬명, 세트명, 지역명 등)는 영어 원문을 괄호 안에 병기하세요. 예: 메두사 세트(Medusa), 드레드세일 리프(Dreadsail Reef).\n\n"
+    else:
+        lang_instruction = ""
+
+    strict_prompt = length_prefix + lang_instruction + STRICT_PROMPT
+    creative_prompt = length_prefix + lang_instruction + SYSTEM_PROMPT
 
     # Routing
     route_result = route(user_message)

@@ -1,5 +1,6 @@
 <script>
   import { getCurrentWindow } from "@tauri-apps/api/window";
+  import { t } from "../lib/i18n.js";
 
   let { opacity = 100, onopacity, onsettings, onclear, onminimize } = $props();
 
@@ -27,23 +28,23 @@
 <div class="header" onmousedown={startDrag}>
   <span class="title">Grimoire</span>
   <div class="actions">
-    <button onclick={() => (showSlider = !showSlider)} title="Opacity" class:active={showSlider}>
+    <button onclick={() => (showSlider = !showSlider)} title={t("opacity")} class:active={showSlider}>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><path d="M12 2V4M12 20V22M4 12H2M22 12H20M5.6 5.6L4.2 4.2M18.4 18.4L19.8 19.8M18.4 5.6L19.8 4.2M5.6 18.4L4.2 19.8"/><path d="M12 7A5 5 0 0 1 12 17" fill="currentColor" opacity="0.3"/></svg>
     </button>
-    <button onclick={onsettings} title="Settings">
+    <button onclick={onsettings} title={t("settings")}>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 1V4M12 20V23M4.2 4.2L6.3 6.3M17.7 17.7L19.8 19.8M1 12H4M20 12H23M4.2 19.8L6.3 17.7M19.8 4.2L17.7 6.3"/></svg>
     </button>
-    <button onclick={onclear} title="Clear">
+    <button onclick={onclear} title={t("clear")}>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22C8 22 5 18.5 5 15C5 11 8 8 9 5C10 8 12 9 12 9C12 9 11 11 12 13C13 11 14 9 14 9C16 12 19 13 19 16C19 19 16 22 12 22Z"/><path d="M12 22C10.5 22 9 20.5 9 18.5C9 16.5 12 15 12 15C12 15 15 16.5 15 18.5C15 20.5 13.5 22 12 22Z" fill="currentColor" opacity="0.2"/></svg>
     </button>
-    <button onclick={minimize} title="Minimize">─</button>
-    <button class="close" onclick={close} title="Close">✕</button>
+    <button onclick={minimize} title={t("minimize")}>─</button>
+    <button class="close" onclick={close} title={t("close")}>✕</button>
   </div>
 </div>
 
 {#if showSlider}
   <div class="slider-wrap">
-    <span class="slider-label">Opacity</span>
+    <span class="slider-label">{t("opacity")}</span>
     <input
       type="range"
       min="20"

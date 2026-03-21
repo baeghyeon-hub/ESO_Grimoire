@@ -4,6 +4,7 @@
   import { listen as tauriListen } from "@tauri-apps/api/event";
   import { health, getConfig, getProviders, sendChat, clearHistory, getDbStatus } from "../lib/api.js";
   import { load, save } from "../lib/storage.js";
+  import { setLang } from "../lib/i18n.js";
   import PanelHeader from "./PanelHeader.svelte";
   import ChatList from "./ChatList.svelte";
   import InputBar from "./InputBar.svelte";
@@ -64,6 +65,7 @@
       config = cfgRes;
       providers = provRes;
       backendOnline = true;
+      setLang(cfgRes.language || "en");
 
       // Check if DB exists
       try {

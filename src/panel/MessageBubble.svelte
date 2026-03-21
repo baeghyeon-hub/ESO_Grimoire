@@ -1,5 +1,6 @@
 <script>
   import { renderMarkdown } from "../lib/markdown.js";
+  import { t } from "../lib/i18n.js";
 
   import { open } from "@tauri-apps/plugin-shell";
   import { openImageViewer } from "../lib/windowManager.js";
@@ -127,12 +128,12 @@
 <!-- svelte-ignore a11y_click_events_have_key_events -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div class="bubble {role}" bind:this={bubbleEl} onclick={handleContentClick}>
-  <div class="label">{role === "user" ? "Vestige" : "Grimoire"}</div>
+  <div class="label">{role === "user" ? t("user_label") : t("bot_label")}</div>
   <div class="content">{@html html}</div>
 
   {#if role === "assistant"}
     <div class="actions">
-      <button onclick={copyText} title="Copy">
+      <button onclick={copyText} title={t("copy")}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="3" width="12" height="16" rx="1.5"/><path d="M4 7V21H16" stroke-dasharray="2 2" opacity="0.5"/><line x1="11" y1="8" x2="17" y2="8" opacity="0.4"/><line x1="11" y1="11" x2="17" y2="11" opacity="0.4"/><line x1="11" y1="14" x2="15" y2="14" opacity="0.4"/></svg>
       </button>
     </div>
@@ -147,11 +148,11 @@
     <div class="wiki-popup-actions">
       <button onclick={searchKeyword}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M16 16L21 21"/></svg>
-        Ask Grimoire
+        {t("ask_grimoire")}
       </button>
       <button onclick={openLink}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        UESP Wiki
+        {t("uesp_wiki")}
       </button>
     </div>
     <button class="wiki-popup-close" onclick={closePopup}>✕</button>

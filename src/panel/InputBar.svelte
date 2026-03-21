@@ -1,4 +1,5 @@
 <script>
+  import { t } from "../lib/i18n.js";
   let { loading = false, onsend } = $props();
   let text = $state("");
 
@@ -21,11 +22,11 @@
   <textarea
     bind:value={text}
     onkeydown={onKeydown}
-    placeholder="Search ESO info (e.g. Medusa set, vDSR)"
+    placeholder={t("input_placeholder")}
     rows="1"
     disabled={loading}
   ></textarea>
-  <button onclick={submit} disabled={loading || !text.trim()} title="Send">
+  <button onclick={submit} disabled={loading || !text.trim()} title={t("send")}>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12H19"/><path d="M13 6L19 12L13 18"/></svg>
   </button>
 </div>

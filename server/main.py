@@ -75,6 +75,7 @@ async def get_config():
     """Return current config (API keys masked)."""
     cfg = load_config()
     result = {
+        "language": cfg.get("language", "en"),
         "provider": cfg.get("provider", "anthropic"),
         "max_tokens": cfg.get("max_tokens", 8192),
         "providers": {},

@@ -1,4 +1,5 @@
 <script>
+  import { t } from "../lib/i18n.js";
   let { onchip } = $props();
 
   const chips = [
@@ -9,8 +10,8 @@
 </script>
 
 <div class="welcome">
-  <h2>Grimoire</h2>
-  <p>Ask me anything about ESO.</p>
+  <h2>{t("welcome_title")}</h2>
+  <p>{t("welcome_desc")}</p>
   <div class="chips">
     {#each chips as chip}
       <button onclick={() => onchip(chip.query)}>{chip.label}</button>
