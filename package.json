@@ -1,0 +1,25 @@
+{
+  "name": "grimoire",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "tauri": "tauri",
+    "build:server": "pyinstaller --onefile --name grimoire-server --distpath build/server --add-data core;core --add-data pipeline;pipeline --add-data rag;rag --hidden-import uvicorn.logging --hidden-import uvicorn.loops.auto --hidden-import uvicorn.protocols.http.auto --hidden-import uvicorn.protocols.websockets.auto --hidden-import uvicorn.lifespan.on --hidden-import lancedb --hidden-import pyarrow --hidden-import voyageai server/main.py",
+    "build:copy": "copy build\\server\\grimoire-server.exe src-tauri\\binaries\\grimoire-server-x86_64-pc-windows-msvc.exe",
+    "build:all": "npm run build:server && npm run build:copy && npm run build && npm run tauri build"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-shell": "^2",
+    "marked": "^17.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^5",
+    "@tauri-apps/cli": "^2",
+    "svelte": "^5",
+    "vite": "^6"
+  }
+}
