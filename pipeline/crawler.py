@@ -32,6 +32,28 @@ CATEGORIES = {
     "companions": "Online-Companions",
     "alchemy": "Online-Alchemy",
     "npcs": "Online-NPCs",
+    "achievements": "Online-Achievements",
+    "antiquities": "Online-Antiquities",
+    "cp_passive": "Online-Champion-Passive",
+    "cp_slotted": "Online-Champion-Slotted",
+    "furnishings": "Online-Furnishings",
+    "recipes": "Online-Recipes",
+    "food": "Online-Food",
+    "delves": "Online-Places-Delves",
+    "public_dungeons": "Online-Places-Public Dungeons",
+    "factions": "Online-Factions",
+    "crown_store": "Online-Crown Store",
+    "mounts": "Online-Mounts",
+    "mementos": "Online-Mementos",
+    "skill_styles": "Online-Skill Styles",
+    "classes": "Online-Classes",
+    "items": "Online-Items",
+    "combat": "Online-Combat",
+    "armor": "Online-Armor",
+    "races": "Online-Races",
+    "events": "Online-Events",
+    "activities": "Online-Activities",
+    "alliance_war": "Online-Alliance War",
 }
 
 # 퀘스트 서브카테고리 (재귀 크롤링 대상)
@@ -49,6 +71,16 @@ LORE_CATEGORIES = {
     "lore-flora": "Lore-Flora",
     "lore-history": "Lore-History",
     "lore-magic": "Lore-Magic",
+    "lore-appendices": "Lore-Appendices",
+    "lore-disease": "Lore-Disease",
+    "lore-calendar": "Lore-Calendar",
+    "lore-names": "Lore-Names",
+    "lore-daedra": "Lore-Daedra",
+    "lore-archive": "Lore-Loremaster's Archive",
+    "lore-undead": "Lore-Undead",
+    "lore-linguistics": "Lore-Linguistics",
+    "lore-spells": "Lore-Spells",
+    "lore-empires": "Lore-Empires",
 }
 
 
@@ -284,7 +316,7 @@ class UESPCrawler:
     def _api_get(self, params: dict) -> dict | None:
         """MediaWiki API GET 요청."""
         try:
-            resp = self._session.get(_UESP_API, params=params, timeout=15)
+            resp = self._session.get(_UESP_API, params=params, timeout=30)
             resp.raise_for_status()
             return resp.json()
         except Exception as e:

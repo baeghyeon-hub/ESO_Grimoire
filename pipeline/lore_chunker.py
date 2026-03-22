@@ -27,14 +27,33 @@ def chunk_lore_pages(*, force: bool = False, progress_fn=None) -> int:
     """
     init_db()
 
+    # 청킹 대상: lore-* 카테고리 + 구조화 테이블 없는 ESO 카테고리
+    _CHUNK_CATEGORIES = (
+        "lore-%",  # 모든 로어
+    )
+    _EXTRA_CHUNK_CATS = (
+        "achievements", "antiquities", "cp_passive", "cp_slotted",
+        "furnishings", "recipes", "food", "delves", "public_dungeons",
+        "factions", "crown_store", "mounts", "mementos", "skill_styles",
+        "classes", "items", "combat", "armor", "races", "events",
+        "activities", "alliance_war",
+    )
+
     with get_db() as conn:
+        cat_filter = "category LIKE 'lore-%'"
+        if _EXTRA_CHUNK_CATS:
+            placeholders = ",".join("?" * len(_EXTRA_CHUNK_CATS))
+            cat_filter += f" OR category IN ({placeholders})"
+
         if force:
             rows = conn.execute(
-                "SELECT id, title, wikitext FROM pages WHERE category LIKE 'lore-%'"
+                f"SELECT id, title, wikitext FROM pages WHERE {cat_filter}",
+                list(_EXTRA_CHUNK_CATS),
             ).fetchall()
         else:
             rows = conn.execute(
-                "SELECT id, title, wikitext FROM pages WHERE category LIKE 'lore-%' AND parsed_at IS NULL"
+                f"SELECT id, title, wikitext FROM pages WHERE ({cat_filter}) AND parsed_at IS NULL",
+                list(_EXTRA_CHUNK_CATS),
             ).fetchall()
 
     total = len(rows)
