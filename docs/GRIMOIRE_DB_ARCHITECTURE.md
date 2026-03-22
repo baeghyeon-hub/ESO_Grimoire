@@ -119,7 +119,7 @@ uesp.db (SQLite)
 ├── zone_dungeons   — 73 zone↔dungeon links
 ├── dungeon_sets    — 337 dungeon↔set links
 ├── pages_fts       — FTS5 full-text search index
-├── lore_chunks     — 12,234 lore + expanded text chunks
+├── lore_chunks     — 12,114 lore + expanded text chunks
 └── lore_chunks_fts — FTS5 lore search index
 ```
 
@@ -235,10 +235,10 @@ UESP Lore Namespace (NS=130)
 |--------|-------|
 | 카테고리 | 42개 (Lore 20 + ESO 22) |
 | 크롤링 페이지 | 33,072 |
-| 생성된 청크 | 12,234 |
+| 생성된 청크 | 12,114 (정제 후) |
 | 총 토큰 수 | 6,921,607 (약 692만) |
-| 임베딩 완료 | 12,234 / 12,234 (100%) |
-| LanceDB 벡터 | 12,234개 (1024차원, float32) |
+| 임베딩 완료 | 12,114 / 12,114 (100%) |
+| LanceDB 벡터 | 12,114개 (1024차원, float32) |
 
 ### 4.3 Chunking Strategy
 
@@ -283,20 +283,22 @@ LoreChunk(
 ```
 User Query: "드웨머가 왜 사라졌어?"
          │
+    Query Expansion (한국어/약어 → 영어: 드웨머 → Dwemer)
+         │
     ┌────┴────┐
     │         │
  Vector    BM25 (FTS5)
- Search    Search
+ Search    Search (expanded query)
     │         │
- Top-20    Top-20
+ Top-30    Top-30
     │         │
     └────┬────┘
          │
     RRF (Reciprocal Rank Fusion, k=60)
          │
-    Merged & Sorted
+    Diversification (max 3 per page)
          │
-    Voyage Reranker (rerank-2.5)
+    Voyage Reranker (rerank-2.5, pool=limit×3)
          │
     Top-5 Results → LLM Context
 ```
@@ -312,6 +314,22 @@ score(doc) = Σ 1/(k + rank_i)   where k=60
 - Voyage rerank-2.5 모델이 쿼리-문서 쌍의 관련성을 0~1 점수로 재평가
 - 초기 검색의 recall + reranker의 precision = 최적 결과
 - Cost: **$0** (200M free tier)
+
+**Query Expansion (v1.0.2+):**
+- 한국어 → 영어 매핑: 드웨머→Dwemer, 데이드라→Daedric Princes, 몰라그 발→Molag Bal 등 30+개
+- ESO 약어 매핑: cp→Champion Points, vdsr→Dreadsail Reef, wb→World Boss 등
+- BM25 키워드 매칭에 특히 효과적 (벡터는 의미 기반이라 원본 사용)
+
+**Result Diversification (v1.0.2+):**
+- 같은 page_title에서 최대 3개 청크만 유지
+- 다양한 소스에서 정보를 가져와 답변 품질 향상
+
+**Chunk Quality Filtering (v1.0.2+):**
+- 이름 목록 페이지 제거 (Redguard Names/Arena 등 648K 문자짜리)
+- 위키 마크업 비율 15% 초과 청크 제거 (테이블만 있는 경우)
+- 텍스트 비율 30% 미만 청크 제거 (템플릿/파이프만 있는 경우)
+- Bibliography, Deprecated, Bugs 섹션 제거
+- 총 120개 노이즈 청크 정리 (12,234 → 12,114)
 
 **Graceful Degradation:**
 - Voyage API 키 없음 → BM25만 사용
@@ -417,8 +435,10 @@ Grimoire/
 │   ├── lore_chunker.py   — Lore 페이지 → 청크 변환
 │   ├── embedder.py       — Voyage AI 임베딩
 │   ├── vector_store.py   — LanceDB 벡터 저장소
-│   ├── lore_search.py    — 하이브리드 검색 엔진
-│   └── build_lore.py     — Lore 파이프라인 마스터 스크립트
+│   ├── lore_search.py    — 하이브리드 검색 엔진 (쿼리 확장 + 다양화)
+│   ├── chunk_cleanup.py  — 청크 품질 정리 (노이즈 제거)
+│   ├── build_lore.py     — Lore 파이프라인 마스터 스크립트
+│   └── build_expanded.py — 확장 카테고리 파이프라인
 ├── rag/
 │   └── query_router.py   — 질의 분류 (Strict/Creative)
 ├── db/
@@ -469,8 +489,8 @@ Grimoire/
 │ Structured Records     :    10,552  │
 │ NPCs                   :    21,165  │
 │ Entity Relationships   :     2,743  │
-│ Text Chunks            :    12,234  │
-│ Embedded Vectors       :    12,234  │
+│ Text Chunks            :    12,114  │
+│ Embedded Vectors       :    12,114  │
 │ Total Tokens           : 6,921,607  │
 │ Vector Dimensions      :     1,024  │
 │ Embedding Model        : voyage-4   │

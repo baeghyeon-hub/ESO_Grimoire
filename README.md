@@ -69,7 +69,7 @@ UESP Wiki (33,072 pages)
     │   Alchemy Combos, Quest Chains
     │
     └─ Lore + Expanded ──→ Vector Search
-        12,234 chunks across 36 categories
+        12,114 chunks across 42 categories
         Voyage AI embeddings (voyage-4, 1024d)
         Hybrid: Vector + BM25 + Reranker
 ```
@@ -93,8 +93,8 @@ UESP Wiki (33,072 pages)
 | Skills | 650 |
 | Dungeon Bosses | 347 |
 | NPCs | 21,165 |
-| Lore + Expanded Chunks | 12,234 |
-| Embedded Vectors (voyage-4, 1024d) | 12,234 |
+| Lore + Expanded Chunks | 12,114 |
+| Embedded Vectors (voyage-4, 1024d) | 12,114 |
 | Total Tokens Embedded | 6,921,607 |
 | Entity Relationships | 2,743 |
 
