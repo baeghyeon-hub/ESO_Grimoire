@@ -17,8 +17,8 @@ _LOG = logging.getLogger(__name__)
 _DB_DIR = "lore.lance"
 _TABLE_NAME = "lore_chunks"
 
-# Voyage 3.5 Lite = 512차원
-_VECTOR_DIM = 512
+# Voyage 4 = 1024차원
+_VECTOR_DIM = 1024
 
 _SCHEMA = pa.schema([
     pa.field("chunk_id", pa.int64()),
