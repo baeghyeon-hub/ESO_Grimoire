@@ -4,12 +4,63 @@
 from __future__ import annotations
 
 import logging
+import re
 
 from pipeline.db import search_lore_fts
 
 _LOG = logging.getLogger(__name__)
 
 _RRF_K = 60  # Reciprocal Rank Fusion 상수
+
+# ── 쿼리 확장: 한국어/약어 → 영어 매핑 ──────────────────
+_QUERY_ALIASES = {
+    # 한국어 → 영어
+    "드웨머": "Dwemer", "드워프": "Dwemer",
+    "아카토쉬": "Akatosh", "아카토시": "Akatosh",
+    "몰라그 발": "Molag Bal", "몰라그발": "Molag Bal",
+    "데이드라": "Daedric Princes Daedra",
+    "데이드릭": "Daedric",
+    "탈모어": "Thalmor", "알드메리": "Aldmeri Dominion",
+    "타이버 셉팀": "Tiber Septim", "탈로스": "Talos",
+    "비벡": "Vivec", "네레바르": "Nerevar",
+    "쉐오고라스": "Sheogorath", "쉐오고라스": "Sheogorath",
+    "허마이오스 모라": "Hermaeus Mora",
+    "메리디아": "Meridia", "아주라": "Azura",
+    "보에디아": "Boethiah", "메팔라": "Mephala",
+    "로칸": "Lorkhan", "로르칸": "Lorkhan",
+    "너크로맨서": "Necromancer", "네크로맨서": "Necromancer",
+    "뱀파이어": "Vampire", "늑대인간": "Werewolf Lycanthropy",
+    "다크 앵커": "Dark Anchor Dolmen",
+    "콜드하버": "Coldharbour",
+    # 약어
+    "cp": "Champion Points",
+    "wb": "World Boss",
+    "hm": "Hard Mode",
+    "dsa": "Dragonstar Arena",
+    "vma": "Vateshran Hollows Maelstrom Arena",
+    "vdsr": "Dreadsail Reef",
+    "vss": "Sunspire",
+    "vcr": "Cloudrest",
+}
+
+
+def _expand_query(query: str) -> str:
+    """한국어/약어 쿼리를 영어로 확장. 원본도 유지."""
+    expanded = query
+    lower = query.lower().strip()
+
+    # 정확히 매칭
+    if lower in _QUERY_ALIASES:
+        expanded = f"{query} {_QUERY_ALIASES[lower]}"
+        return expanded
+
+    # 부분 매칭
+    for ko, en in _QUERY_ALIASES.items():
+        if ko in lower:
+            expanded = f"{query} {en}"
+            break
+
+    return expanded
 
 
 def search_lore(
@@ -21,18 +72,22 @@ def search_lore(
 ) -> list[dict]:
     """하이브리드 Lore 검색.
 
-    1. 벡터 검색 (LanceDB) → top-20
-    2. BM25 검색 (FTS5) → top-20
-    3. RRF 병합
-    4. (선택) Voyage Reranker
-    5. top-{limit} 반환
+    1. 쿼리 확장 (한국어/약어 → 영어)
+    2. 벡터 검색 (LanceDB) → top-30
+    3. BM25 검색 (FTS5) → top-30 (원본 + 확장 쿼리)
+    4. RRF 병합
+    5. (선택) Voyage Reranker → top-{limit}
 
     Fallback: 벡터 DB 없으면 BM25만, API 키 없으면 BM25만.
     """
+    expanded = _expand_query(query)
+    if expanded != query:
+        _LOG.info("[lore_search] query expanded: %r -> %r", query, expanded)
+
     candidates: dict[int, dict] = {}  # chunk_id → {page_title, section, text, rrf_score}
 
-    # 1. 벡터 검색
-    vector_hits = _vector_search(query, cfg, limit=20)
+    # 1. 벡터 검색 (원본 쿼리 — 벡터는 의미 기반이라 확장 불필요)
+    vector_hits = _vector_search(query, cfg, limit=30)
     for rank, hit in enumerate(vector_hits):
         cid = hit.get("chunk_id", 0)
         if cid not in candidates:
@@ -47,8 +102,9 @@ def search_lore(
         candidates[cid]["rrf_score"] += 1.0 / (_RRF_K + rank + 1)
         candidates[cid]["sources"].append("vector")
 
-    # 2. BM25 검색
-    bm25_hits = _bm25_search(query, limit=20)
+    # 2. BM25 검색 — 확장된 쿼리로 (키워드 매칭이라 확장 효과 큼)
+    bm25_query = expanded if expanded != query else query
+    bm25_hits = _bm25_search(bm25_query, limit=30)
     for rank, hit in enumerate(bm25_hits):
         cid = hit.get("id", 0)
         if cid not in candidates:
@@ -72,9 +128,13 @@ def search_lore(
     # 전체 텍스트 보강 (BM25는 snippet만 가지고 있을 수 있으므로)
     ranked = _enrich_texts(ranked)
 
-    # 4. 선택적 Reranker
+    # 4. 중복 제거 — 같은 page_title의 청크가 너무 많으면 다양성 ↓
+    ranked = _diversify(ranked, max_per_page=3)
+
+    # 5. 선택적 Reranker
+    rerank_pool = min(len(ranked), limit * 3)  # 리랭커에 더 많은 후보 제공
     if use_reranker and len(ranked) > limit:
-        ranked = _rerank(query, ranked, cfg, limit=limit)
+        ranked = _rerank(query, ranked[:rerank_pool], cfg, limit=limit)
     else:
         ranked = ranked[:limit]
 
@@ -83,6 +143,25 @@ def search_lore(
         r["score"] = r.get("rerank_score", r.get("rrf_score", 0.0))
 
     return ranked
+
+
+def _diversify(candidates: list[dict], max_per_page: int = 3) -> list[dict]:
+    """같은 page_title에서 최대 max_per_page개만 유지."""
+    page_counts: dict[str, int] = {}
+    result = []
+    overflow = []
+
+    for c in candidates:
+        title = c.get("page_title", "")
+        count = page_counts.get(title, 0)
+        if count < max_per_page:
+            result.append(c)
+            page_counts[title] = count + 1
+        else:
+            overflow.append(c)
+
+    # overflow는 뒤에 추가 (리랭커가 재평가할 수 있도록)
+    return result + overflow
 
 
 def _vector_search(query: str, cfg: dict, limit: int = 20) -> list[dict]:
