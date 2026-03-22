@@ -30,7 +30,7 @@ Choose your preferred LLM provider. Bring your own API key and switch freely bet
 
 ### Deep Lore Knowledge
 
-Ask complex lore questions and get comprehensive, structured answers with collapsible sections, inline UESP references, and comparison tables — all sourced from a local database of **30,000+ UESP wiki pages**.
+Ask complex lore questions and get comprehensive, structured answers with collapsible sections, inline UESP references, and comparison tables — all sourced from a local database of **33,000+ UESP wiki pages**.
 
 > *"Tell me about Lorkhan"*
 
@@ -61,16 +61,16 @@ Grimoire combines a **structured SQLite database** with **semantic vector search
 ### Data Pipeline
 
 ```
-UESP Wiki (30,506 pages)
+UESP Wiki (33,072 pages)
     │
     ├─ Structured Parsing ──→ SQLite DB
     │   Sets, Quests, Skills, Dungeons,
     │   NPCs, Zones, Boss Strategies,
     │   Alchemy Combos, Quest Chains
     │
-    └─ Lore Namespace ──→ Vector Search
-        6,731 pages → 8,997 chunks
-        Voyage AI embeddings (512d)
+    └─ Lore + Expanded ──→ Vector Search
+        12,234 chunks across 36 categories
+        Voyage AI embeddings (voyage-4, 1024d)
         Hybrid: Vector + BM25 + Reranker
 ```
 
@@ -86,14 +86,16 @@ UESP Wiki (30,506 pages)
 
 | Category | Count |
 |----------|-------|
-| Total Crawled Pages | 30,506 |
+| Total Crawled Pages | 33,072 |
 | Structured Records | 10,552 |
 | Equipment Sets | 720 |
 | Quests (with chains) | 2,383 |
 | Skills | 650 |
 | Dungeon Bosses | 347 |
-| Lore Text Chunks | 8,997 |
-| Embedded Vectors | 8,997 |
+| NPCs | 21,165 |
+| Lore + Expanded Chunks | 12,234 |
+| Embedded Vectors (voyage-4, 1024d) | 12,234 |
+| Total Tokens Embedded | 6,921,607 |
 | Entity Relationships | 2,743 |
 
 ---
@@ -114,9 +116,9 @@ UESP Wiki (30,506 pages)
 
 ### Option A: Download Release (Recommended)
 
-1. Download **`Grimoire_1.0.0_x64-setup.exe`** from the [Releases](https://github.com/baeghyeon-hub/ESO_Grimoire/releases) page
+1. Download **`Grimoire_1.0.1_x64-setup.exe`** from the [Releases](https://github.com/baeghyeon-hub/ESO_Grimoire/releases) page
 2. Run the installer — installs to `%LOCALAPPDATA%\Grimoire` (no admin required)
-3. Download **`grimoire-db-v1.0.0.zip`** from the same release page
+3. Download **`grimoire-db.zip`** from [v1.0.2](https://github.com/baeghyeon-hub/ESO_Grimoire/releases/tag/v1.0.2)
 4. Extract the zip so the folder structure looks like this:
    ```
    %LOCALAPPDATA%\Grimoire\
